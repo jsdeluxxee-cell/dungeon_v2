@@ -1,0 +1,13 @@
+Hero
+70
+pond
+cave_mouth
+fishhook
+True
+beach|torch|False|None
+cave_mouth|None|False|None
+pond|None|True|10
+abandoned_bakery|canned_goods|True|40
+abandoned_armory|spear|True|65
+long_hallway|None|True|70
+mysterious_door|maui_stone|False|None
