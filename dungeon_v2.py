@@ -143,28 +143,33 @@ class NPC:
             print("You got:", self.gift)
 
 
-def save_game(player, filename="save.txt"):
+import json
+
+def save_game(player, rooms, filename="save.json"):
+    save_data = {
+        "player": {
+            "name": player.name,
+            "health": player.health,
+            "current_room": player.current_room,
+            "previous_room": player.previous_room,
+            "inventory": player.inventory,
+            "alive": player.alive
+        },
+        "rooms": {}
+    }
+
+    for room_name, room in rooms.items():
+        save_data["rooms"][room_name] = {
+            "item": room.item,
+            "monster_alive": room.monster.alive if room.monster else None,
+            "monster_health": room.monster.health if room.monster else None
+        }
+
     with open(filename, "w") as file:
-        file.write(player.name + "\n")
-        file.write(str(player.health) + "\n")
-        file.write(player.current_room + "\n")
-        file.write(player.previous_room + "\n")
-        file.write(",".join(player.inventory) + "\n")
-        file.write(str(player.alive) + "\n")
-
-        for room_name, room in rooms.items():
-            item_value = room.item if room.item else "None"
-
-            if room.monster:
-                monster_alive = str(room.monster.alive)
-                monster_health = str(room.monster.health)
-            else:
-                monster_alive = "False"
-                monster_health = "None"
-
-            file.write(f"{room_name}|{item_value}|{monster_alive}|{monster_health}\n")
+        json.dump(save_data, file, indent=2)
 
     print("Game saved!")
+
 
 
 def load_game(filename="save.txt"):
