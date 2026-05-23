@@ -1,4 +1,5 @@
 from random import randint
+import json
 
 
 class Player:
@@ -143,8 +144,6 @@ class NPC:
             print("You got:", self.gift)
 
 
-import json
-
 def save_game(player, rooms, filename="save.json"):
     save_data = {
         "player": {
@@ -171,45 +170,28 @@ def save_game(player, rooms, filename="save.json"):
     print("Game saved!")
 
 
-
-def load_game(filename="save.txt"):
+def load_game(rooms, filename="save.json"):
     try:
         with open(filename, "r") as file:
-            lines = file.readlines()
+            save_data = json.load(file)
 
-        name = lines[0].strip()
-        health = int(lines[1].strip())
-        current_room = lines[2].strip()
-        previous_room = lines[3].strip()
-        inventory_string = lines[4].strip()
-        alive = lines[5].strip() == "True"
+        player_data = save_data["player"]
 
-        player = Player(name)
-        player.health = health
-        player.current_room = current_room
-        player.previous_room = previous_room
-        player.alive = alive
+        player = Player(player_data["name"])
+        player.health = player_data["health"]
+        player.current_room = player_data["current_room"]
+        player.previous_room = player_data["previous_room"]
+        player.inventory = player_data["inventory"]
+        player.alive = player_data["alive"]
 
-        if inventory_string:
-            player.inventory = inventory_string.split(",")
-        else:
-            player.inventory = []
+        for room_name, room_state in save_data["rooms"].items():
+            rooms[room_name].item = room_state["item"]
 
-        for line in lines[6:]:
-            line = line.strip()
+            if rooms[room_name].monster and room_state["monster_alive"] is not None:
+                rooms[room_name].monster.alive = room_state["monster_alive"]
 
-            if not line:
-                continue
-
-            room_name, item_value, monster_alive, monster_health = line.split("|")
-
-            rooms[room_name].item = None if item_value == "None" else item_value
-
-            if rooms[room_name].monster:
-                rooms[room_name].monster.alive = (monster_alive == "True")
-
-                if monster_health != "None":
-                    rooms[room_name].monster.health = int(monster_health)
+            if rooms[room_name].monster and room_state["monster_health"] is not None:
+                rooms[room_name].monster.health = room_state["monster_health"]
 
         print("Game loaded!")
         return player
@@ -299,7 +281,7 @@ def fight():
         action = input("attack, run, save: ").lower()
 
         if action == "save":
-            save_game(player)
+            save_game(player, rooms)
             continue
 
         if action == "run":
@@ -381,9 +363,9 @@ while player.alive:
     elif action == "inventory":
         inventory()
     elif action == "save":
-        save_game(player)
+        save_game(player, rooms)
     elif action == "load":
-        loaded = load_game()
+        loaded = load_game(rooms)
         if loaded is not None:
             player = loaded
     elif action.startswith("use "):
