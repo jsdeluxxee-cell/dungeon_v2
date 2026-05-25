@@ -1,7 +1,7 @@
 {
   "player": {
     "name": "Hero",
-    "health": 85,
+    "health": 100,
     "current_room": "pond",
     "previous_room": "cave_mouth",
     "inventory": [
@@ -23,7 +23,7 @@
     "pond": {
       "item": null,
       "monster_alive": true,
-      "monster_health": 35
+      "monster_health": 60
     },
     "abandoned_bakery": {
       "item": "canned_goods",
