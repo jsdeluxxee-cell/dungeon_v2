@@ -1,6 +1,11 @@
 from random import randint
 import json
+import logging
 
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(levelname)s: %(message)s"
+)
 
 class Player:
     def __init__(self, name):
@@ -77,22 +82,6 @@ class Nightmarcher(Monster):
             return
 
         super().attack(player)
-
-
-class Pueo(Monster):
-    def __init__(self):
-        super().__init__("Pueo", 40, 12, "The Pueo swoops in!")
-
-    def take_damage(self, amount):
-        if randint(1, 2) == 1:
-            print("The Pueo dodged your attack!")
-            return
-        super().take_damage(amount)
-
-
-class Kahuli(Monster):
-    def __init__(self):
-        super().__init__("kahuli", 80, 15, "The kahuli attacks!")
 
 
 class Kāmohoaliʻi(Monster):
@@ -175,6 +164,10 @@ def load_game(rooms, filename="save.json"):
         with open(filename, "r") as file:
             save_data = json.load(file)
 
+        logging.debug(f"loaded current_room: {save_data['player']['current_room']}")
+        logging.debug(f"loaded health: {save_data['player']['health']}")
+        logging.info("Game loaded successfully")
+
         player_data = save_data["player"]
 
         player = Player(player_data["name"])
@@ -193,11 +186,11 @@ def load_game(rooms, filename="save.json"):
             if rooms[room_name].monster and room_state["monster_health"] is not None:
                 rooms[room_name].monster.health = room_state["monster_health"]
 
-        print("Game loaded!")
+        logging.info("Game loaded successfully")
         return player
 
     except FileNotFoundError:
-        print("No save file found.")
+        logging.warning("No save file found.")
         return None
 
 
@@ -241,13 +234,17 @@ rooms = {
     )
 }
 
-
 player = Player("Hero")
 
 
 def win_game():
     print("\nYOU WIN! YOU FOUND MAUI'S STONE!")
     player.alive = False
+
+
+def check_win():
+    if "maui_stone" in player.inventory:
+        win_game()
 
 
 def show_room():
@@ -350,7 +347,7 @@ def use(item_name):
         print("You can't use that.")
 
 
-while player.alive:
+while True:
     show_room()
     action = input("\nWhat do you want to do? ").lower()
 
@@ -365,9 +362,8 @@ while player.alive:
     elif action == "save":
         save_game(player, rooms)
     elif action == "load":
-        loaded = load_game(rooms)
-        if loaded is not None:
-            player = loaded
+        player = load_game(rooms)
+        check_win()
     elif action.startswith("use "):
         use(action.replace("use ", ""))
     else:

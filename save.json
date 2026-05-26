@@ -2,11 +2,9 @@
   "player": {
     "name": "Hero",
     "health": 100,
-    "current_room": "pond",
-    "previous_room": "cave_mouth",
-    "inventory": [
-      "fishhook"
-    ],
+    "current_room": "beach",
+    "previous_room": "beach",
+    "inventory": [],
     "alive": true
   },
   "rooms": {
