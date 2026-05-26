@@ -1,8 +1,8 @@
 {
   "player": {
     "name": "Hero",
-    "health": 100,
-    "current_room": "beach",
+    "health": "999",
+    "current_room": "mysterious_door",
     "previous_room": "beach",
     "inventory": [],
     "alive": true
