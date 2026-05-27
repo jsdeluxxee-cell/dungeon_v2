@@ -1,0 +1,69 @@
+{
+  "starting_room": "beach",
+  "rooms": {
+    "beach": {
+      "description": "You wake up on a quiet beach. A cave is to the north.",
+      "exits": {
+        "north": "cave_mouth"
+      },
+      "item": "torch"
+    },
+    "cave_mouth": {
+      "description": "A tunnel goes deeper. A kahuna sits by a fire.",
+      "exits": {
+        "south": "beach",
+        "north": "pond"
+      },
+      "item": null,
+      "npc": {
+        "name": "kahuna",
+        "dialogue": "Take this fishhook. You will need it.",
+        "gift": "fishhook"
+      }
+    },
+    "pond": {
+      "description": "A huge mo'o rises from the water!",
+      "exits": {
+        "south": "cave_mouth",
+        "east": "abandoned_armory",
+        "west": "abandoned_bakery"
+      },
+      "item": null,
+      "monster_type": "Moo"
+    },
+    "abandoned_bakery": {
+      "description": "An old bakery. Heat fills the air...",
+      "exits": {
+        "east": "long_hallway"
+      },
+      "item": "canned_goods",
+      "monster_type": "Pele"
+    },
+    "abandoned_armory": {
+      "description": "An old armory filled with broken weapons.",
+      "exits": {
+        "west": "pond",
+        "east": "long_hallway"
+      },
+      "item": "spear",
+      "monster_type": "K\u0101mohoali\u02bbi"
+    },
+    "long_hallway": {
+      "description": "A dark hallway stretches ahead.",
+      "exits": {
+        "west": "abandoned_armory",
+        "north": "abandoned_bakery",
+        "door": "mysterious_door"
+      },
+      "item": null,
+      "monster_type": "Nightmarcher"
+    },
+    "mysterious_door": {
+      "description": "A glowing door hums with energy...",
+      "exits": {
+        "back": "long_hallway"
+      },
+      "item": "maui_stone"
+    }
+  }
+}

@@ -76,11 +76,9 @@ class Nightmarcher(Monster):
 
     def attack(self, player):
         self.turn += 1
-
         if self.turn % 2 == 0:
             print("The Nightmarcher passes through you... (miss)")
             return
-
         super().attack(player)
 
 
@@ -92,6 +90,14 @@ class Kāmohoaliʻi(Monster):
 class Pele(Monster):
     def __init__(self):
         super().__init__("Pele", 40, 23, "Pele erupts in fire!")
+
+
+MONSTER_CLASSES = {
+    "Moo": Moo,
+    "Nightmarcher": Nightmarcher,
+    "Kāmohoaliʻi": Kāmohoaliʻi,
+    "Pele": Pele
+}
 
 
 class Room:
@@ -159,14 +165,39 @@ def save_game(player, rooms, filename="save.json"):
     print("Game saved!")
 
 
+def load_dungeon(filename="dungeon.json"):
+    with open(filename, "r") as file:
+        dungeon_data = json.load(file)
+
+    loaded_rooms = {}
+
+    for room_name, room_data in dungeon_data["rooms"].items():
+
+        monster = None
+        if "monster_type" in room_data:
+            monster_class = MONSTER_CLASSES[room_data["monster_type"]]
+            monster = monster_class()
+
+        npc = None
+        if "npc" in room_data:
+            npc_data = room_data["npc"]
+            npc = NPC(npc_data["name"], npc_data["dialogue"], npc_data["gift"])
+
+        loaded_rooms[room_name] = Room(
+            room_data["description"],
+            room_data["exits"],
+            room_data["item"],
+            npc,
+            monster
+        )
+
+    return loaded_rooms
+
+
 def load_game(rooms, filename="save.json"):
     try:
         with open(filename, "r") as file:
             save_data = json.load(file)
-
-        logging.debug(f"loaded current_room: {save_data['player']['current_room']}")
-        logging.debug(f"loaded health: {save_data['player']['health']}")
-        logging.info("Game loaded successfully")
 
         player_data = save_data["player"]
 
@@ -180,13 +211,6 @@ def load_game(rooms, filename="save.json"):
         for room_name, room_state in save_data["rooms"].items():
             rooms[room_name].item = room_state["item"]
 
-            if rooms[room_name].monster and room_state["monster_alive"] is not None:
-                rooms[room_name].monster.alive = room_state["monster_alive"]
-
-            if rooms[room_name].monster and room_state["monster_health"] is not None:
-                rooms[room_name].monster.health = room_state["monster_health"]
-
-        logging.info("Game loaded successfully")
         return player
 
     except FileNotFoundError:
@@ -194,46 +218,42 @@ def load_game(rooms, filename="save.json"):
         return None
 
 
-rooms = {
-    "beach": Room(
-        "You wake up on a quiet beach. A cave is to the north.",
-        {"north": "cave_mouth"},
-        item="torch"
-    ),
-    "cave_mouth": Room(
-        "A tunnel goes deeper. A kahuna sits by a fire.",
-        {"south": "beach", "north": "pond"},
-        npc=NPC("kahuna", "Take this fishhook. You will need it.", "fishhook")
-    ),
-    "pond": Room(
-        "A huge mo'o rises from the water!",
-        {"south": "cave_mouth", "east": "abandoned_armory", "west": "abandoned_bakery"},
-        monster=Moo()
-    ),
-    "abandoned_bakery": Room(
-        "An old bakery. Heat fills the air...",
-        {"east": "long_hallway"},
-        item="canned_goods",
-        monster=Pele()
-    ),
-    "abandoned_armory": Room(
-        "An old armory filled with broken weapons.",
-        {"west": "pond", "east": "long_hallway"},
-        item="spear",
-        monster=Kāmohoaliʻi()
-    ),
-    "long_hallway": Room(
-        "A dark hallway stretches ahead.",
-        {"west": "abandoned_armory", "north": "abandoned_bakery", "door": "mysterious_door"},
-        monster=Nightmarcher()
-    ),
-    "mysterious_door": Room(
-        "A glowing door hums with energy...",
-        {"back": "long_hallway"},
-        item="maui_stone"
-    )
-}
+def export_dungeon(rooms, filename="dungeon.json"):
+    dungeon_data = {
+        "starting_room": "beach",
+        "rooms": {}
+    }
 
+    for room_name, room in rooms.items():
+        room_dict = {
+            "description": room.description,
+            "exits": room.exits,
+            "item": room.item
+        }
+
+        if room.monster:
+         room_dict["monster"] = {
+        "type": type(room.monster).__name__,
+        "health": room.monster.health,
+        "alive": room.monster.alive
+    }
+
+        if room.npc:
+            room_dict["npc"] = {
+                "name": room.npc.name,
+                "dialogue": room.npc.dialogue,
+                "gift": room.npc.gift
+            }
+
+        dungeon_data["rooms"][room_name] = room_dict
+
+    with open(filename, "w") as file:
+        json.dump(dungeon_data, file, indent=2)
+
+    print("Dungeon exported!")
+
+
+rooms = load_dungeon()
 player = Player("Hero")
 
 
@@ -254,12 +274,10 @@ def show_room():
 
 def talk():
     room = rooms[player.current_room]
-
-    if not room.npc:
+    if room.npc:
+        room.npc.talk(player)
+    else:
         print("No one here to talk to.")
-        return
-
-    room.npc.talk(player)
 
 
 def fight():
@@ -282,24 +300,19 @@ def fight():
             continue
 
         if action == "run":
-            print("You ran away!")
             player.current_room = player.previous_room
             return
 
         damage = 10
-
         if "fishhook" in player.inventory:
             damage += 15
-
         if "spear" in player.inventory:
             damage += 10
 
         monster.take_damage(damage)
 
-        if not monster.alive:
-            break
-
-        monster.attack(player)
+        if monster.alive:
+            monster.attack(player)
 
 
 def move(direction):
@@ -310,7 +323,6 @@ def move(direction):
         player.current_room = room.exits[direction]
 
         new_room = rooms[player.current_room]
-
         if new_room.monster and new_room.monster.alive:
             fight()
     else:
@@ -336,13 +348,10 @@ def inventory():
 
 
 def use(item_name):
-    if item_name == "canned_goods":
-        if "canned_goods" in player.inventory:
-            player.heal(30)
-            player.inventory.remove("canned_goods")
-            print("You ate the canned goods.")
-        else:
-            print("You don't have that item.")
+    if item_name == "canned_goods" and "canned_goods" in player.inventory:
+        player.heal(30)
+        player.inventory.remove("canned_goods")
+        print("You ate the canned goods.")
     else:
         print("You can't use that.")
 
