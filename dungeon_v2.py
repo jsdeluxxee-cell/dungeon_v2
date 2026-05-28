@@ -191,7 +191,7 @@ def load_dungeon(filename="dungeon.json"):
             monster
         )
 
-    return loaded_rooms
+    return loaded_rooms, dungeon_data["starting_room"]
 
 
 def load_game(rooms, filename="save.json"):
@@ -211,50 +211,23 @@ def load_game(rooms, filename="save.json"):
         for room_name, room_state in save_data["rooms"].items():
             rooms[room_name].item = room_state["item"]
 
+            if rooms[room_name].monster and room_state["monster_alive"] is not None:
+                rooms[room_name].monster.alive = room_state["monster_alive"]
+
+            if rooms[room_name].monster and room_state["monster_health"] is not None:
+                rooms[room_name].monster.health = room_state["monster_health"]
+
         return player
 
     except FileNotFoundError:
         logging.warning("No save file found.")
         return None
 
+rooms, starting_room = load_dungeon()
 
-def export_dungeon(rooms, filename="dungeon.json"):
-    dungeon_data = {
-        "starting_room": "beach",
-        "rooms": {}
-    }
-
-    for room_name, room in rooms.items():
-        room_dict = {
-            "description": room.description,
-            "exits": room.exits,
-            "item": room.item
-        }
-
-        if room.monster:
-         room_dict["monster"] = {
-        "type": type(room.monster).__name__,
-        "health": room.monster.health,
-        "alive": room.monster.alive
-    }
-
-        if room.npc:
-            room_dict["npc"] = {
-                "name": room.npc.name,
-                "dialogue": room.npc.dialogue,
-                "gift": room.npc.gift
-            }
-
-        dungeon_data["rooms"][room_name] = room_dict
-
-    with open(filename, "w") as file:
-        json.dump(dungeon_data, file, indent=2)
-
-    print("Dungeon exported!")
-
-
-rooms = load_dungeon()
 player = Player("Hero")
+player.current_room = starting_room
+player.previous_room = starting_room
 
 
 def win_game():
@@ -371,8 +344,12 @@ while True:
     elif action == "save":
         save_game(player, rooms)
     elif action == "load":
-        player = load_game(rooms)
-        check_win()
+        loaded_player = load_game(rooms)
+
+        if loaded_player:
+            player = loaded_player
+            check_win()
+
     elif action.startswith("use "):
         use(action.replace("use ", ""))
     else:

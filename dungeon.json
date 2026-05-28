@@ -2,7 +2,7 @@
   "starting_room": "beach",
   "rooms": {
     "beach": {
-      "description": "You wake up on a quiet beach. A cave is to the north.",
+      "description": "A stormy beach with crashing waves",
       "exits": {
         "north": "cave_mouth"
       },
@@ -67,3 +67,4 @@
     }
   }
 }
+
