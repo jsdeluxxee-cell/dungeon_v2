@@ -1,70 +1,48 @@
 {
-  "starting_room": "beach",
+  "starting_room": "Cavern of the Bones",
   "rooms": {
-    "beach": {
-      "description": "A stormy beach with crashing waves",
+    "Cavern of the Bones": {
+      "description": "You are inside a cavern. The air feels strange.",
       "exits": {
-        "north": "cave_mouth"
-      },
-      "item": "torch"
-    },
-    "cave_mouth": {
-      "description": "A tunnel goes deeper. A kahuna sits by a fire.",
-      "exits": {
-        "south": "beach",
-        "north": "pond"
+        "east": "Hollow of Forgotten Kahuna"
       },
       "item": null,
-      "npc": {
-        "name": "kahuna",
-        "dialogue": "Take this fishhook. You will need it.",
-        "gift": "fishhook"
-      }
+      "monster_type": null
     },
-    "pond": {
-      "description": "A huge mo'o rises from the water!",
+    "Hollow of Forgotten Kahuna": {
+      "description": "You are inside a hollow. The air feels strange.",
       "exits": {
-        "south": "cave_mouth",
-        "east": "abandoned_armory",
-        "west": "abandoned_bakery"
+        "west": "Cavern of the Bones",
+        "east": "Hollow of Forgotten Pele"
+      },
+      "item": null,
+      "monster_type": "Pele"
+    },
+    "Hollow of Forgotten Pele": {
+      "description": "You are inside a hollow. The air feels strange.",
+      "exits": {
+        "west": "Hollow of Forgotten Kahuna",
+        "east": "Cavern of Forgotten Bones"
+      },
+      "item": null,
+      "monster_type": "Pele"
+    },
+    "Cavern of Forgotten Bones": {
+      "description": "You are inside a cavern. The air feels strange.",
+      "exits": {
+        "west": "Hollow of Forgotten Pele",
+        "east": "Cavern of the Kahuna"
       },
       "item": null,
       "monster_type": "Moo"
     },
-    "abandoned_bakery": {
-      "description": "An old bakery. Heat fills the air...",
+    "Cavern of the Kahuna": {
+      "description": "You are inside a cavern. The air feels strange.",
       "exits": {
-        "east": "long_hallway"
+        "west": "Cavern of Forgotten Bones"
       },
-      "item": "canned_goods",
-      "monster_type": "Pele"
-    },
-    "abandoned_armory": {
-      "description": "An old armory filled with broken weapons.",
-      "exits": {
-        "west": "pond",
-        "east": "long_hallway"
-      },
-      "item": "spear",
-      "monster_type": "K\u0101mohoali\u02bbi"
-    },
-    "long_hallway": {
-      "description": "A dark hallway stretches ahead.",
-      "exits": {
-        "west": "abandoned_armory",
-        "north": "abandoned_bakery",
-        "door": "mysterious_door"
-      },
-      "item": null,
-      "monster_type": "Nightmarcher"
-    },
-    "mysterious_door": {
-      "description": "A glowing door hums with energy...",
-      "exits": {
-        "back": "long_hallway"
-      },
-      "item": "maui_stone"
+      "item": "maui_stone",
+      "monster_type": null
     }
   }
 }
-
