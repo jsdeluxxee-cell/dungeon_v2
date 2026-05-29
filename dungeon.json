@@ -1,48 +1,58 @@
 {
-  "starting_room": "Cavern of the Bones",
-  "rooms": {
-    "Cavern of the Bones": {
-      "description": "You are inside a cavern. The air feels strange.",
-      "exits": {
-        "east": "Hollow of Forgotten Kahuna"
-      },
-      "item": null,
-      "monster_type": null
-    },
-    "Hollow of Forgotten Kahuna": {
-      "description": "You are inside a hollow. The air feels strange.",
-      "exits": {
-        "west": "Cavern of the Bones",
-        "east": "Hollow of Forgotten Pele"
-      },
-      "item": null,
-      "monster_type": "Pele"
-    },
-    "Hollow of Forgotten Pele": {
-      "description": "You are inside a hollow. The air feels strange.",
-      "exits": {
-        "west": "Hollow of Forgotten Kahuna",
-        "east": "Cavern of Forgotten Bones"
-      },
-      "item": null,
-      "monster_type": "Pele"
-    },
-    "Cavern of Forgotten Bones": {
-      "description": "You are inside a cavern. The air feels strange.",
-      "exits": {
-        "west": "Hollow of Forgotten Pele",
-        "east": "Cavern of the Kahuna"
-      },
-      "item": null,
-      "monster_type": "Moo"
-    },
-    "Cavern of the Kahuna": {
-      "description": "You are inside a cavern. The air feels strange.",
-      "exits": {
-        "west": "Cavern of Forgotten Bones"
-      },
-      "item": "maui_stone",
-      "monster_type": null
+    "starting_room": "Shadow Cavern",
+    "rooms": {
+        "Shadow Cavern": {
+            "type": "Ruins",
+            "description": "Torchlight flickers. a stone altar stands near the entrance, and stones grind softly nearby.",
+            "monster_type": null,
+            "item": null,
+            "maui_stone": false,
+            "exits": [
+                "Ancient Depths"
+            ]
+        },
+        "Ancient Depths": {
+            "type": "Cave",
+            "description": "Shadows dance across the walls across the cave. damp cave surfaces surrounds you while saltwater drifts through the chamber. You suddenly spot a Fire Spirit watching you carefully.",
+            "monster_type": "Fire Spirit",
+            "item": null,
+            "maui_stone": false,
+            "exits": [
+                "Shadow Cavern",
+                "Whispering Hollow"
+            ]
+        },
+        "Whispering Hollow": {
+            "type": "Volcanic Chamber",
+            "description": "wind whistles through cracks. broken statues rests beneath spiral markings, and a strange stillness fills the chamber. You suddenly spot a Mo\u02bbo watching you carefully.",
+            "monster_type": "Mo\u02bbo",
+            "item": null,
+            "maui_stone": false,
+            "exits": [
+                "Ancient Depths",
+                "Forgotten Passage"
+            ]
+        },
+        "Forgotten Passage": {
+            "type": "Ruins",
+            "description": "Shadows dance across the walls across the ruins. rough stone walls surrounds you while sulfur hangs in the air. You suddenly spot a Mo\u02bbo watching you carefully.",
+            "monster_type": "Mo\u02bbo",
+            "item": null,
+            "maui_stone": false,
+            "exits": [
+                "Whispering Hollow",
+                "Temple of Fire"
+            ]
+        },
+        "Temple of Fire": {
+            "type": "Cave",
+            "description": "Torchlight flickers. The air feels heavy inside the cave, and a weathered shrine sits beneath ancient Hawaiian symbols. The legendary Maui Stone radiates power before you.",
+            "monster_type": null,
+            "item": null,
+            "maui_stone": true,
+            "exits": [
+                "Forgotten Passage"
+            ]
+        }
     }
-  }
 }

@@ -120,7 +120,7 @@ class Room:
         if self.monster and self.monster.alive:
             print("A", self.monster.name, "is here!")
 
-        print("Exits:", ", ".join(self.exits.keys()))
+        print("Exits:", ", ".join(self.exits))
 
 
 class NPC:
@@ -164,7 +164,6 @@ def save_game(player, rooms, filename="save.json"):
 
     print("Game saved!")
 
-
 def load_dungeon(filename="dungeon.json"):
     with open(filename, "r") as file:
         dungeon_data = json.load(file)
@@ -173,11 +172,15 @@ def load_dungeon(filename="dungeon.json"):
 
     for room_name, room_data in dungeon_data["rooms"].items():
 
+        
         monster = None
-        if "monster_type" in room_data:
-            monster_class = MONSTER_CLASSES[room_data["monster_type"]]
+        monster_type = room_data.get("monster_type")
+
+        if monster_type in MONSTER_CLASSES:
+            monster_class = MONSTER_CLASSES[monster_type]
             monster = monster_class()
 
+        
         npc = None
         if "npc" in room_data:
             npc_data = room_data["npc"]
@@ -192,8 +195,6 @@ def load_dungeon(filename="dungeon.json"):
         )
 
     return loaded_rooms, dungeon_data["starting_room"]
-
-
 def load_game(rooms, filename="save.json"):
     try:
         with open(filename, "r") as file:
@@ -289,17 +290,20 @@ def fight():
 
 
 def move(direction):
+
     room = rooms[player.current_room]
 
-    if direction in room.exits:
-        player.previous_room = player.current_room
-        player.current_room = room.exits[direction]
+    direction = direction.lower()
 
-        new_room = rooms[player.current_room]
-        if new_room.monster and new_room.monster.alive:
-            fight()
-    else:
-        print("Can't go that way.")
+    for exit_name in room.exits:
+
+        if direction == exit_name.lower():
+
+            player.previous_room = player.current_room
+            player.current_room = exit_name
+            return
+
+    print("Can't go that way.")
 
 
 def take():

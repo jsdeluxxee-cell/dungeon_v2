@@ -1,85 +1,212 @@
-import random
 import json
+import random
 
-PLACE_TYPES = {"Cavern", "Hollow", "Chamber"}
-CONNECTORS = {"of the", "of Forgotten"}
-SUBJECTS = {"Kahuna", "Bones", "Pele"}
+TEXTURES = {
+    "rough stone walls",
+    "damp cave surfaces",
+    "cracked lava rock"
+}
 
-MONSTER_POOL = ["Moo", "Nightmarcher", "Kāmohoaliʻi", "Pele"]
+SCENTS = {
+    "sulfur hangs in the air",
+    "wet earth fills the room",
+    "saltwater drifts through the chamber"
+}
+
+MOODS = {
+    "an eerie calm",
+    "a strange stillness",
+    "an uneasy silence"
+}
+
+SOUNDS = {
+    "water drips in the distance",
+    "wind whistles through cracks",
+    "stones grind softly nearby"
+}
+
+LIGHT_STATES = {
+    "Torchlight flickers",
+    "Dim blue light glows",
+    "Shadows dance across the walls"
+}
+
+FEATURES = {
+    "a stone altar",
+    "broken statues",
+    "ancient carvings"
+}
+
+FEATURE_ALT = {
+    "a collapsed pillar",
+    "a ring of volcanic stone",
+    "a weathered shrine"
+}
+
+CARVINGS = {
+    "spiral markings",
+    "ancient Hawaiian symbols",
+    "weathered battle scenes"
+}
+
+STARTING_TEMPLATES = {
+    "{light}. {feature} stands near the entrance, and {sound}."
+}
+
+MIDDLE_TEMPLATES = {
+    "{light} across the {place_type}. {texture} surrounds you while {scent}.",
+    "{sound}. {feature} rests beneath {carving}, and {mood} fills the chamber."
+}
+
+FINAL_TEMPLATES = {
+    "{light}. The air feels heavy inside the {place_type}, and {feature_alt} sits beneath {carving}."
+}
+
+MONSTER_PRESENCE = {
+    "A {monster} emerges from the shadows.",
+    "You suddenly spot a {monster} watching you carefully."
+}
+
+MAUI_STONE_PRESENCE = {
+    "A glowing Maui Stone rests at the center of the room.",
+    "The legendary Maui Stone radiates power before you."
+}
+
+PLACE_TYPES = {
+    "Cave",
+    "Temple",
+    "Ruins",
+    "Volcanic Chamber"
+}
+
+ROOM_NAMES = {
+    "Whispering Hollow",
+    "Shadow Cavern",
+    "Temple of Fire",
+    "Ancient Depths",
+    "Forgotten Passage"
+}
+
+MONSTER_POOL = {
+    "Moʻo",
+    "Nightmarcher",
+    "Fire Spirit",
+    "Stone Guardian"
+}
 
 used_names = set()
 
-
 def generate_room_name():
-    place_type = random.choice(list(PLACE_TYPES))
-    connector = random.choice(list(CONNECTORS))
-    subject = random.choice(list(SUBJECTS))
 
-    full_name = f"{place_type} {connector} {subject}"
-    return full_name, place_type
+    available_names = ROOM_NAMES - used_names
 
+    if not available_names:
+        return ("Unknown Chamber", "Cave")
 
-def get_unique_name():
-    while True:
-        full_name, place_type = generate_room_name()
-        if full_name not in used_names:
-            used_names.add(full_name)
-            return full_name, place_type
+    room_name = random.choice(tuple(available_names))
+    used_names.add(room_name)
 
+    place_type = random.choice(tuple(PLACE_TYPES))
 
-def generate_description(place_type):
-    return f"You are inside a {place_type.lower()}. The air feels strange."
+    return (room_name, place_type)
 
+def generate_room_description(place_type, room_position, total_rooms, monster=None):
 
-def generate_dungeon(num_rooms=5):
-    rooms = {}
-    room_info = []
+    if room_position == 0:
+        templates = STARTING_TEMPLATES
+    elif room_position == total_rooms - 1:
+        templates = FINAL_TEMPLATES
+    else:
+        templates = MIDDLE_TEMPLATES
 
-    # generate names
-    for i in range(num_rooms):
-        room_name, place_type = get_unique_name()
-        room_info.append((room_name, place_type))
+    template = random.choice(tuple(templates))
 
-    # build rooms
-    for i, (room_name, place_type) in enumerate(room_info):
+    description = template.format(
+        place_type=place_type.lower(),
+        texture=random.choice(tuple(TEXTURES)),
+        scent=random.choice(tuple(SCENTS)),
+        mood=random.choice(tuple(MOODS)),
+        sound=random.choice(tuple(SOUNDS)),
+        light=random.choice(tuple(LIGHT_STATES)),
+        feature=random.choice(tuple(FEATURES)),
+        feature_alt=random.choice(tuple(FEATURE_ALT)),
+        carving=random.choice(tuple(CARVINGS))
+    )
 
-        exits = {}
+    if monster is not None:
+        monster_text = random.choice(tuple(MONSTER_PRESENCE))
+        description += " " + monster_text.format(monster=monster)
 
-        if i > 0:
-            exits["west"] = room_info[i - 1][0]
+    if room_position == total_rooms - 1:
+        description += " " + random.choice(tuple(MAUI_STONE_PRESENCE))
 
-        if i < num_rooms - 1:
-            exits["east"] = room_info[i + 1][0]
+    return description
 
-        # RULES
-        if i == 0:
+def generate_dungeon(total_rooms):
+
+    dungeon = []
+
+    for room_position in range(total_rooms):
+
+        room_name, place_type = generate_room_name()
+
+        if room_position == 0:
             monster = None
-            item = None
-
-        elif i == num_rooms - 1:
+        elif room_position == total_rooms - 1:
             monster = None
-            item = "maui_stone"
-
         else:
-            monster = random.choice(MONSTER_POOL)
-            item = None
+            monster = random.choice(tuple(MONSTER_POOL))
 
-        rooms[room_name] = {
-            "description": generate_description(place_type),
-            "exits": exits,
-            "item": item,
-            "monster_type": monster
+        description = generate_room_description(
+            place_type,
+            room_position,
+            total_rooms,
+            monster
+        )
+
+        exits = []
+
+        if room_position > 0:
+            exits.append(dungeon[room_position - 1]["name"])
+
+        room = {
+            "name": room_name,
+            "type": place_type,
+            "description": description,
+            "monster_type": monster,
+            "item": None,
+            "maui_stone": room_position == total_rooms - 1,
+            "exits": exits
         }
 
-    return rooms
+        dungeon.append(room)
 
+        if room_position > 0:
+            dungeon[room_position - 1]["exits"].append(room_name)
 
-dungeon = generate_dungeon()
+    return dungeon
 
-with open("dungeon.json", "w") as f:
-    json.dump({
-        "starting_room": list(dungeon.keys())[0],
-        "rooms": dungeon
-    }, f, indent=2)
+dungeon_data = {
+    "starting_room": None,
+    "rooms": {}
+}
 
-print("Dungeon saved to dungeon.json")
+dungeon_rooms = generate_dungeon(5)
+
+dungeon_data["starting_room"] = dungeon_rooms[0]["name"]
+
+for room in dungeon_rooms:
+
+    dungeon_data["rooms"][room["name"]] = {
+        "type": room["type"],
+        "description": room["description"],
+        "monster_type": room["monster_type"],
+        "item": room["item"],
+        "maui_stone": room["maui_stone"],
+        "exits": room["exits"]
+    }
+
+with open("dungeon.json", "w") as file:
+    json.dump(dungeon_data, file, indent=4)
+
+print("Dungeon generated successfully!")
