@@ -79,39 +79,56 @@ PLACE_TYPES = {
     "Volcanic Chamber"
 }
 
-ROOM_NAMES = {
-    "Whispering Hollow",
-    "Shadow Cavern",
-    "Temple of Fire",
-    "Ancient Depths",
-    "Forgotten Passage"
+CONNECTORS = {
+    "of",
+    "beneath",
+    "near",
+    "beyond",
+    "under"
+}
+
+SUBJECTS = {
+    "Fire",
+    "Bones",
+    "Storms",
+    "Whispers",
+    "Ancients",
+    "Tides",
+    "Shadows",
+    "the Volcano"
 }
 
 MONSTER_POOL = {
-    "Moʻo",
+    "Moo",
     "Nightmarcher",
-    "Fire Spirit",
-    "Stone Guardian"
+    "Kāmohoaliʻi",
+    "Pele"
+}
+
+ITEM_POOL = {
+    "health_potion",
+    "lava_charm",
+    "ancient_coin",
+    "torch"
 }
 
 used_names = set()
 
+
 def generate_room_name():
+    while True:
+        place_type = random.choice(tuple(PLACE_TYPES))
+        room_name = (
+            f"{place_type} "
+            f"{random.choice(tuple(CONNECTORS))} "
+            f"{random.choice(tuple(SUBJECTS))}"
+        )
+        if room_name not in used_names:
+            used_names.add(room_name)
+            return (room_name, place_type)
 
-    available_names = ROOM_NAMES - used_names
-
-    if not available_names:
-        return ("Unknown Chamber", "Cave")
-
-    room_name = random.choice(tuple(available_names))
-    used_names.add(room_name)
-
-    place_type = random.choice(tuple(PLACE_TYPES))
-
-    return (room_name, place_type)
 
 def generate_room_description(place_type, room_position, total_rooms, monster=None):
-
     if room_position == 0:
         templates = STARTING_TEMPLATES
     elif room_position == total_rooms - 1:
@@ -142,18 +159,21 @@ def generate_room_description(place_type, room_position, total_rooms, monster=No
 
     return description
 
-def generate_dungeon(total_rooms):
 
+def generate_dungeon(total_rooms):
     dungeon = []
 
     for room_position in range(total_rooms):
 
         room_name, place_type = generate_room_name()
 
+        if room_position == total_rooms - 1:
+            room_name = "Temple of Fire"
+
         if room_position == 0:
             monster = None
         elif room_position == total_rooms - 1:
-            monster = None
+            monster = "Pele"
         else:
             monster = random.choice(tuple(MONSTER_POOL))
 
@@ -169,13 +189,20 @@ def generate_dungeon(total_rooms):
         if room_position > 0:
             exits.append(dungeon[room_position - 1]["name"])
 
+        # FIXED ITEM LOGIC: room 1 now gives both healing and weapon
+        if room_position == 1:
+            item = ["canned_goods", "fishhook"]
+        elif room_position == total_rooms - 1:
+            item = "maui_stone"
+        else:
+            item = None
+
         room = {
             "name": room_name,
             "type": place_type,
             "description": description,
             "monster_type": monster,
-            "item": None,
-            "maui_stone": room_position == total_rooms - 1,
+            "item": item,
             "exits": exits
         }
 
@@ -185,6 +212,7 @@ def generate_dungeon(total_rooms):
             dungeon[room_position - 1]["exits"].append(room_name)
 
     return dungeon
+
 
 dungeon_data = {
     "starting_room": None,
@@ -196,13 +224,11 @@ dungeon_rooms = generate_dungeon(5)
 dungeon_data["starting_room"] = dungeon_rooms[0]["name"]
 
 for room in dungeon_rooms:
-
     dungeon_data["rooms"][room["name"]] = {
         "type": room["type"],
         "description": room["description"],
         "monster_type": room["monster_type"],
-        "item": room["item"],
-        "maui_stone": room["maui_stone"],
+        "item": dungeon_rooms[dungeon_rooms.index(room)]["item"],
         "exits": room["exits"]
     }
 

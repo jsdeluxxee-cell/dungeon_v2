@@ -14,8 +14,9 @@ class Player:
         self.max_health = 100
         self.inventory = []
         self.alive = True
-        self.current_room = "beach"
-        self.previous_room = "beach"
+
+        self.current_room = None
+        self.previous_room = None
 
     def take_damage(self, amount, attacker_name):
         self.health -= amount
@@ -30,9 +31,13 @@ class Player:
         self.health += amount
         if self.health > self.max_health:
             self.health = self.max_health
+        print(f"You healed for {amount} HP. Current HP: {self.health}")
 
     def pick_up(self, item):
-        self.inventory.append(item)
+        if isinstance(item, list):
+            self.inventory.extend(item)
+        else:
+            self.inventory.append(item)
         print("You picked up:", item)
 
 
@@ -114,9 +119,6 @@ class Room:
         if self.item:
             print("You see:", self.item)
 
-        if self.npc:
-            print(self.npc.name, "is here.")
-
         if self.monster and self.monster.alive:
             print("A", self.monster.name, "is here!")
 
@@ -139,31 +141,6 @@ class NPC:
             print("You got:", self.gift)
 
 
-def save_game(player, rooms, filename="save.json"):
-    save_data = {
-        "player": {
-            "name": player.name,
-            "health": player.health,
-            "current_room": player.current_room,
-            "previous_room": player.previous_room,
-            "inventory": player.inventory,
-            "alive": player.alive
-        },
-        "rooms": {}
-    }
-
-    for room_name, room in rooms.items():
-        save_data["rooms"][room_name] = {
-            "item": room.item,
-            "monster_alive": room.monster.alive if room.monster else None,
-            "monster_health": room.monster.health if room.monster else None
-        }
-
-    with open(filename, "w") as file:
-        json.dump(save_data, file, indent=2)
-
-    print("Game saved!")
-
 def load_dungeon(filename="dungeon.json"):
     with open(filename, "r") as file:
         dungeon_data = json.load(file)
@@ -172,7 +149,6 @@ def load_dungeon(filename="dungeon.json"):
 
     for room_name, room_data in dungeon_data["rooms"].items():
 
-        
         monster = None
         monster_type = room_data.get("monster_type")
 
@@ -180,7 +156,6 @@ def load_dungeon(filename="dungeon.json"):
             monster_class = MONSTER_CLASSES[monster_type]
             monster = monster_class()
 
-        
         npc = None
         if "npc" in room_data:
             npc_data = room_data["npc"]
@@ -189,44 +164,18 @@ def load_dungeon(filename="dungeon.json"):
         loaded_rooms[room_name] = Room(
             room_data["description"],
             room_data["exits"],
-            room_data["item"],
+            room_data.get("item"),
             npc,
             monster
         )
 
     return loaded_rooms, dungeon_data["starting_room"]
-def load_game(rooms, filename="save.json"):
-    try:
-        with open(filename, "r") as file:
-            save_data = json.load(file)
 
-        player_data = save_data["player"]
-
-        player = Player(player_data["name"])
-        player.health = player_data["health"]
-        player.current_room = player_data["current_room"]
-        player.previous_room = player_data["previous_room"]
-        player.inventory = player_data["inventory"]
-        player.alive = player_data["alive"]
-
-        for room_name, room_state in save_data["rooms"].items():
-            rooms[room_name].item = room_state["item"]
-
-            if rooms[room_name].monster and room_state["monster_alive"] is not None:
-                rooms[room_name].monster.alive = room_state["monster_alive"]
-
-            if rooms[room_name].monster and room_state["monster_health"] is not None:
-                rooms[room_name].monster.health = room_state["monster_health"]
-
-        return player
-
-    except FileNotFoundError:
-        logging.warning("No save file found.")
-        return None
 
 rooms, starting_room = load_dungeon()
 
 player = Player("Hero")
+
 player.current_room = starting_room
 player.previous_room = starting_room
 
@@ -234,11 +183,6 @@ player.previous_room = starting_room
 def win_game():
     print("\nYOU WIN! YOU FOUND MAUI'S STONE!")
     player.alive = False
-
-
-def check_win():
-    if "maui_stone" in player.inventory:
-        win_game()
 
 
 def show_room():
@@ -264,13 +208,13 @@ def fight():
     print("\nA fight starts!")
 
     while monster.alive and player.alive:
+
         print("Your HP:", player.health)
         print(monster.name, "HP:", monster.health)
 
         action = input("attack, run, save: ").lower()
 
         if action == "save":
-            save_game(player, rooms)
             continue
 
         if action == "run":
@@ -285,22 +229,31 @@ def fight():
 
         monster.take_damage(damage)
 
-        if monster.alive:
-            monster.attack(player)
+        if not monster.alive:
+            room.monster = None
+            player.heal(15)
+            break
+
+        monster.attack(player)
+
+        if player.health <= 0:
+            player.alive = False
+            return
 
 
 def move(direction):
-
     room = rooms[player.current_room]
 
-    direction = direction.lower()
-
     for exit_name in room.exits:
-
-        if direction == exit_name.lower():
-
+        if direction.lower() == exit_name.lower():
             player.previous_room = player.current_room
             player.current_room = exit_name
+
+            new_room = rooms[player.current_room]
+
+            if new_room.monster and new_room.monster.alive:
+                fight()
+
             return
 
     print("Can't go that way.")
@@ -325,15 +278,21 @@ def inventory():
 
 
 def use(item_name):
-    if item_name == "canned_goods" and "canned_goods" in player.inventory:
-        player.heal(30)
-        player.inventory.remove("canned_goods")
-        print("You ate the canned goods.")
+    item_name = item_name.strip().lower()
+
+    if item_name in player.inventory:
+
+        if item_name == "canned_goods":
+            player.heal(30)
+            player.inventory.remove("canned_goods")
+            print("You ate the canned goods.")
+        else:
+            print("You can't use that right now.")
     else:
-        print("You can't use that.")
+        print("You don't have that item.")
 
 
-while True:
+while player.alive:
     show_room()
     action = input("\nWhat do you want to do? ").lower()
 
@@ -345,15 +304,6 @@ while True:
         take()
     elif action == "inventory":
         inventory()
-    elif action == "save":
-        save_game(player, rooms)
-    elif action == "load":
-        loaded_player = load_game(rooms)
-
-        if loaded_player:
-            player = loaded_player
-            check_win()
-
     elif action.startswith("use "):
         use(action.replace("use ", ""))
     else:
