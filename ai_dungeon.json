@@ -1,0 +1,79 @@
+{
+    "starting_room": "Coastal Cave of Dawn",
+    "rooms": {
+        "Coastal Cave of Dawn": {
+            "type": "Cave",
+            "description": "Soft ocean winds drift through the cave entrance. Ancient carvings of Maui line the walls while distant waves echo beneath the cliffs.",
+            "monster_type": null,
+            "item": "fishhook",
+            "exits": [
+                "Lava Tunnel of Echoes"
+            ]
+        },
+
+        "Lava Tunnel of Echoes": {
+            "type": "Volcanic Chamber",
+            "description": "Torchlight flickers across black lava stone. The air carries the scent of sulfur, and old chants seem to linger in the darkness.",
+            "monster_type": "Nightmarcher",
+            "item": null,
+            "exits": [
+                "Coastal Cave of Dawn",
+                "Ruins near Honu Bay"
+            ]
+        },
+
+        "Ruins near Honu Bay": {
+            "type": "Ruins",
+            "description": "Broken temple stones rest beneath creeping vines. Legends of Kāmohoaliʻi are etched into weathered pillars facing the sea.",
+            "monster_type": "Kāmohoaliʻi",
+            "item": "canned_goods",
+            "exits": [
+                "Lava Tunnel of Echoes",
+                "Temple of Moon Tides"
+            ]
+        },
+
+        "Temple of Moon Tides": {
+            "type": "Temple",
+            "description": "Moonlight filters through cracks in the ceiling. Ancient offerings surround a stone altar dedicated to spirits of the ocean.",
+            "monster_type": "Moo",
+            "item": null,
+            "exits": [
+                "Ruins near Honu Bay",
+                "Cavern beyond Banyans"
+            ]
+        },
+
+        "Cavern beyond Banyans": {
+            "type": "Cave",
+            "description": "Damp stone walls shimmer with moisture. Faint whispers tell stories of wandering Nightmarchers crossing hidden paths.",
+            "monster_type": "Nightmarcher",
+            "item": null,
+            "exits": [
+                "Temple of Moon Tides",
+                "Volcanic Hall of Pele"
+            ]
+        },
+
+        "Volcanic Hall of Pele": {
+            "type": "Volcanic Chamber",
+            "description": "Rivers of glowing magma illuminate the chamber. The presence of Pele feels close as heat radiates from every surface.",
+            "monster_type": "Pele",
+            "item": null,
+            "exits": [
+                "Cavern beyond Banyans",
+                "Sanctum under Haleakala"
+            ]
+        },
+
+        "Sanctum under Haleakala": {
+            "type": "Volcanic Chamber",
+            "description": "Ancient volcanic stone forms a sacred chamber beneath the mountain. Symbols of Maui circle a pedestal where a legendary relic rests. The legendary Maui Stone radiates power before you.",
+            "monster_type": "Pele",
+            "item": "maui_stone",
+            "exits": [
+                "Volcanic Hall of Pele"
+            ]
+        }
+    }
+}

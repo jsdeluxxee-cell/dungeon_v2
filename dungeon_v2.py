@@ -142,7 +142,7 @@ class NPC:
 
 
 def load_dungeon(filename="dungeon.json"):
-    with open(filename, "r") as file:
+    with open(filename, "r", encoding="utf-8") as file:
         dungeon_data = json.load(file)
 
     loaded_rooms = {}
@@ -172,7 +172,7 @@ def load_dungeon(filename="dungeon.json"):
     return loaded_rooms, dungeon_data["starting_room"]
 
 
-rooms, starting_room = load_dungeon()
+rooms, starting_room = load_dungeon("ai_dungeon.json")
 
 player = Player("Hero")
 
