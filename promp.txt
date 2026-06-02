@@ -1,0 +1,134 @@
+I need you to generate a JSON dungeon for a Hawaiian/maui themed text adventure game I built in Python. The dungeon must conform exactly to the following specification.
+
+EXAMPLE OF VALID OUTPUT:
+
+"starting_room": "Volcanic Chamber under Tides",
+"rooms": {
+    "Volcanic Chamber under Tides": {
+        "type": "Volcanic Chamber",
+        "description": "Shadows dance across the walls. broken statues stands near the entrance, and water drips in the distance.",
+        "monster_type": null,
+        "item": null,
+        "exits": [
+            "Volcanic Chamber of Whispers"
+        ]
+    },
+    "Volcanic Chamber of Whispers": {
+        "type": "Volcanic Chamber",
+        "description": "Torchlight flickers across the volcanic chamber. rough stone walls surrounds you while saltwater drifts through the chamber. You suddenly spot a Pele watching you carefully.",
+        "monster_type": "Pele",
+        "item": [
+            "canned_goods",
+            "fishhook"
+        ],
+        "exits": [
+            "Volcanic Chamber under Tides",
+            "Ruins near Whispers"
+        ]
+    },
+    "Ruins near Whispers": {
+        "type": "Ruins",
+        "description": "Shadows dance across the walls across the ruins. cracked lava rock surrounds you while saltwater drifts through the chamber. You suddenly spot a Kāmohoaliʻi watching you carefully.",
+        "monster_type": "Kāmohoaliʻi",
+        "item": null,
+        "exits": [
+            "Volcanic Chamber of Whispers",
+            "Cave beyond Ancients"
+        ]
+    },
+    "Cave beyond Ancients": {
+        "type": "Cave",
+        "description": "Shadows dance across the walls across the cave. damp cave surfaces surrounds you while sulfur hangs in the air. You suddenly spot a Moo watching you carefully.",
+        "monster_type": "Moo",
+        "item": null,
+        "exits": [
+            "Ruins near Whispers",
+            "Temple of Fire"
+        ]
+    },
+    "Temple of Fire": {
+        "type": "Volcanic Chamber",
+        "description": "Shadows dance across the walls. The air feels heavy inside the volcanic chamber, and a ring of volcanic stone sits beneath spiral markings. You suddenly spot a Pele watching you carefully. The legendary Maui Stone radiates power before you.",
+        "monster_type": "Pele",
+        "item": "maui_stone",
+        "exits": [
+            "Cave beyond Ancients"
+        ]
+    }
+}
+
+REQUIREMENTS:
+
+- The dungeon must have between 6 and 10 rooms.
+- The starting_room field must match an actual room name (a key in rooms).
+- Each room must have these fields exactly: type, description, monster_type, item, exits.
+- monster_type must be one of: "Moo", "Nightmarcher", "Kāmohoaliʻi", "Pele", or null. No other values are valid.
+- Every name in any exits list must exist as a key in rooms.
+- The first room (starting_room) must have no monster.
+- Exactly one room (the deepest one) must have "maui_stone" as its item.
+- The dungeon must be solvable — there must be a path from starting_room to the room containing maui_stone.
+- Descriptions should be atmospheric and reference Hawaiian mythology where it fits.
+- Should be clean and neat like example of valid output.
+- Code must match the valid output with proper spacing and commas.
+- Code must have clean proper spacing where each segment is separated for organization.
+- Code must have spacing between each room.
+- Code must be in one codeblock.
+- Ensure all braces, brackets, commas, quotes, and indentation are valid JSON.
+- The output must be directly copy-pasteable into a JSON file.
+- Generate a valid JSON object only.
+- Add proper spacing at the start.
+- The JSON root object must start at column 0 with no leading spaces or tabs. Only nested objects may be indented using 4 spaces.
+- Output must be valid JSON.
+- Every exit must exactly match an existing room name in rooms and all rooms must be reachable from the starting room.
+- The starting room should have a "fishhook" and a random room should have a healing item aka "canned_goods".
+
+OUTPUT FORMAT:
+No explanation. No prose before or after.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
