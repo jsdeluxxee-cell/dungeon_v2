@@ -12,4 +12,4 @@ def deal_damage(amount):
 
     deal_damage(25)
     deal_damage(100)
-    deal_damage(7)
+    deal_damage(7) 
