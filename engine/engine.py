@@ -1,7 +1,14 @@
+from content.generator import load_dungeon
+from core.player import Player
+
+
 class Engine:
-    def __init__(self, player, rooms):
-        self.player = player
-        self.rooms = rooms
+    def __init__(self):
+        self.rooms, self.starting_room = load_dungeon("content/ai_dungeon.json")
+
+        self.player = Player("Hero")
+        self.player.current_room = self.starting_room
+        self.player.previous_room = self.starting_room
 
     def run(self):
         while self.player.alive:
