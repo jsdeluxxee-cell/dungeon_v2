@@ -1,8 +1,10 @@
+from core.config import PLAYER_START_HP, PLAYER_MAX_HP
+
 class Player:
     def __init__(self, name):
         self.name = name
-        self.health = 100
-        self.max_health = 100
+        self.max_health = PLAYER_MAX_HP
+        self.health = PLAYER_START_HP
         self.inventory = []
         self.alive = True
 

@@ -1,3 +1,4 @@
+from core.config import SELF_PLAYER_HEAL, FISHHOOK_DAMAGE, DEFAULT_DAMAGE, SPEAR_DAMAGE
 from content.generator import load_dungeon
 from core.player import Player
 
@@ -132,18 +133,18 @@ class Engine:
                 self.player.current_room = self.player.previous_room
                 return
 
-            damage = 10
+            damage = DEFAULT_DAMAGE
 
             if "fishhook" in self.player.inventory:
-                damage += 15
+                damage += FISHHOOK_DAMAGE
             if "spear" in self.player.inventory:
-                damage += 10
+                damage += SPEAR_DAMAGE
 
             monster.take_damage(damage)
 
             if not monster.alive:
                 room.monster = None
-                self.player.heal(15)
+                self.player.heal(SELF_PLAYER_HEAL)
                 print("You defeated the monster!")
                 break
 
